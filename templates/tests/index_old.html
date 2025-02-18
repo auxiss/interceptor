@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Interface Config</h1>
+
+    <div>
+        <label for="BrigeIfaceSelector">Bridge Interface</label>
+        <select id="BrigeIfaceSelector">
+
+        </select>
+    </div>
+
+    <div>
+        <label for="SnifIfaceSelector">Sniff Interface</label>
+        <select id="SnifIfaceSelector">
+            
+        </select>
+    </div>
+
+    <button id="setButton">Set</button>
+
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+
+{% endblock %}
