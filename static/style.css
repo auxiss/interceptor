@@ -29,8 +29,7 @@ main{
 }
 main p{
     color: var(--secondary-text-clr);
-    margin-top: 5px;
-    margin-bottom: 15px;
+
 }
 
 .container{
@@ -213,6 +212,7 @@ main p{
 #ok-buuton {
     top: 10px;
     left: 50%;
+    margin-top: 10px;
     background: #383838;
     color: #fff;
 

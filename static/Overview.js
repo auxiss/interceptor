@@ -7,6 +7,41 @@ pktInfoBox = document.getElementById('text-message');
 
 let filters = '';
 
+
+function displayLayers(layersData) {
+    
+    pktInfoBox.innerHTML = ''; 
+    Object.entries(layersData).forEach(([layer, fields]) => {
+        // Create an h3 for the layer
+        const layerTitle = document.createElement("h3");
+        layerTitle.textContent = layer;
+
+        // Create a div to hold the fields (initially hidden)
+        const fieldsContainer = document.createElement("div");
+        fieldsContainer.style.display = "none";
+
+        // Loop through the fields
+        Object.entries(fields).forEach(([key, value]) => {
+            const fieldParagraph = document.createElement("p");
+            fieldParagraph.textContent = `${key}: ${value}`;
+            fieldsContainer.appendChild(fieldParagraph); // Append to the container
+        });
+
+        // Toggle visibility when clicking the h3 element
+        layerTitle.addEventListener("click", () => {
+            fieldsContainer.style.display = 
+                fieldsContainer.style.display === "none" ? "block" : "none";
+        });
+
+        
+        // Append the elements to the container
+        pktInfoBox.appendChild(layerTitle);
+        pktInfoBox.appendChild(fieldsContainer);
+    });
+}
+
+
+
 function updateList(filters = '') {
     console.log('updateing')
 
@@ -48,10 +83,6 @@ function updateList(filters = '') {
             li.addEventListener('click',() =>{
                 pktInfoBox.classList.add("show");
 
-                let packetName = pktInfoBox.getElementsByTagName('h2')[0]; // Gets all <p> tags inside
-                let ditaials = pktInfoBox.getElementsByTagName('p')[0]; // Gets all <p> tags inside
-
-                packetName.textContent = li.textContent
 
                
                 
@@ -76,8 +107,20 @@ function updateList(filters = '') {
                 .then(data => {
                     console.log('data:')
                     console.log(data);
+                    displayLayers(data)
 
-                    ditaials.textContent = data
+                    const okButton = document.createElement("button");
+                    okButton.id = 'ok-buuton'
+                    okButton.textContent = 'close'
+                    pktInfoBox.appendChild(okButton);
+                    okButton.addEventListener('click',() =>{
+                        pktInfoBox.classList.remove("show");
+                    })
+
+
+                    
+
+                    
 
 
                 })

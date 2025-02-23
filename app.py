@@ -2,7 +2,7 @@
 from scapy.all import *
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-import json
+
 
 
 from lisener import snifer
@@ -170,4 +170,4 @@ def pluginsApi():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True)
