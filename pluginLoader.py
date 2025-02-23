@@ -5,7 +5,7 @@ import os
 
 
 
-# all plugins must be in lowers case
+
 
 def get_plugin_paths(plugin_folder = "plugins"):
     plugins = []
@@ -45,9 +45,12 @@ class FLowParcer:
         tloop.start()
 
     def load_plugin(self,plugin_name,lisener,BrigeIface):
+        print(f'plugin name: {plugin_name}')
         plugin_paths = get_plugin_paths()
         for plugin_path in plugin_paths:
-            if plugin_name in plugin_path:
+            print(f'avelable plugin: {plugin_path}')
+            if plugin_name.lower() in plugin_path.lower():
+                print(f'plugin path: {plugin_path}')
                 break
 
         module = importlib.import_module(plugin_path)
