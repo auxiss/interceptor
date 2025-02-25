@@ -17,12 +17,23 @@ tracingMode = False
 def run_plugin(pkt):
     global lisener
     global BrigeIface
+    src_ip = None
 
     if pkt.haslayer(IP):
+        print('from ip')
         src_ip = pkt[IP].src
         dst_ip = pkt[IP].dst
 
+    elif pkt.haslayer(ARP):
+        print('from ARP')
+        src_ip = pkt[ARP].psrc
+        dst_ip = pkt[ARP].pdst
 
+
+
+    if src_ip != None:
+        print(src_ip)
+        print('passed')
         if src_ip not in Network.nodes() or dst_ip not in Network.nodes():
 
             if tracingMode:
@@ -37,9 +48,6 @@ def run_plugin(pkt):
                         Network.add_edge(src, ip)
                         src = ip
             else:
-
-
-
                 try:
                     print("------->>new packet")
                     print("src ip: "+src_ip)
