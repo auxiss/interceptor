@@ -20,23 +20,48 @@ def run_plugin(pkt):
     src_ip = None
 
     if pkt.haslayer(IP):
-        print('from ip')
+        #print('from ip')
         src_ip = pkt[IP].src
         dst_ip = pkt[IP].dst
 
+        if pkt.haslayer(TCP):
+            #print('TCP flags:')
+            #print(pkt[TCP].flags)
+            if pkt[TCP].flags == 'S':
+                print(f"client: {src_ip}")
+                print(f"server ip: {dst_ip}")
+                print(f"port: {pkt[TCP].dport}")
+
+
+    elif pkt.haslayer(IPv6):
+        src_ip = pkt[IPv6].src
+        dst_ip = pkt[IPv6].dst
+
+        if pkt.haslayer(TCP):
+            #print('TCP flags:')
+            #print(pkt[TCP].flags)
+            if pkt[TCP].flags == 'S':
+                print(f"client: {src_ip}")
+                print(f"server ip: {dst_ip}")
+                print(f"port: {pkt[TCP].dport}")
+
+
+
     elif pkt.haslayer(ARP):
-        print('from ARP')
+        #print('from ARP')
         src_ip = pkt[ARP].psrc
         dst_ip = pkt[ARP].pdst
 
 
 
     if src_ip != None:
-        print(src_ip)
-        print('passed')
+        #print(src_ip)
+        #print('passed')
         if src_ip not in Network.nodes() or dst_ip not in Network.nodes():
 
             if tracingMode:
+
+                #experemental
                 if dst_ip != '192.168.1.4':
                     print('tracing is active!')
                     print(f'om iface: {lisener.iface}')
@@ -61,7 +86,7 @@ def run_plugin(pkt):
                     print("ERROR: in webmaper network addsion")
 
     else:
-        #print(pkt.summary())
+        print(pkt.summary())
         pass
 
 
