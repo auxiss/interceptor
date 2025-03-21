@@ -138,7 +138,10 @@ def pluginsApi():
         plugins = []
         plugin_paths = pl.get_plugin_paths()
         for plugin_path in plugin_paths:
-            plugins.append(plugin_path.split('.')[1])
+            plugin_path = plugin_path.split('/')[1]
+            plugin_path = plugin_path.split('.')[0]
+            plugins.append(plugin_path)
+
         print( jsonify(plugins))
 
         return jsonify(plugins), 201

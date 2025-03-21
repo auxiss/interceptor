@@ -5,15 +5,42 @@ import os
 
 
 
+import importlib.util
+import sys
+import os
+
+
+def load_module_from_path(plugin_path):
+
+
+    if not os.path.exists(plugin_path):
+        raise FileNotFoundError(f"Error: {plugin_path} not found")
+
+    # Extract module name from the filename
+    module_name = os.path.splitext(os.path.basename(plugin_path))[0]
+
+    spec = importlib.util.spec_from_file_location(module_name, plugin_path)
+    module = importlib.util.module_from_spec(spec)
+
+    # Add the module to sys.modules
+    sys.modules[module_name] = module
+
+    spec.loader.exec_module(module)
+
+    return module
+
+
+
 
 
 def get_plugin_paths(plugin_folder = "plugins"):
     plugins = []
 
     for filename in os.listdir(plugin_folder):
-        if filename.endswith(".py"):
-            module_name = filename[:-3]  # Strip ".py"
-            module_path = f"{plugin_folder}.{module_name}"
+        if filename.endswith(".plug"):
+            module_folder = filename
+            module_name = filename[:-5]  # Strip ".plug"
+            module_path = f"{plugin_folder}/{module_folder}/{module_name}.py"
 
             plugins.append(module_path)
 
@@ -53,7 +80,9 @@ class FLowParcer:
                 print(f'plugin path: {plugin_path}')
                 break
 
-        module = importlib.import_module(plugin_path)
+
+        module = load_module_from_path(plugin_path)
+        #module = importlib.import_module(plugin_path)
         
         if hasattr(module, "load_plugin"):
             module.load_plugin(lisener,BrigeIface)

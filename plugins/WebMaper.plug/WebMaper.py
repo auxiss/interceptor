@@ -59,33 +59,20 @@ def run_plugin(pkt):
         #print('passed')
         if src_ip not in Network.nodes() or dst_ip not in Network.nodes():
 
-            if tracingMode:
+            try:
+                print("------->>new packet")
+                print("src ip: "+src_ip)
+                print("dst ip: "+dst_ip)
+                
+                Network.add_node(src_ip)
+                Network.add_node(dst_ip)
+                Network.add_edge(src_ip, dst_ip)
 
-                #experemental
-                if dst_ip != '192.168.1.4':
-                    print('tracing is active!')
-                    print(f'om iface: {lisener.iface}')
-                    path = tacer.TraceRoute(dst_ip,lisener.iface)
-
-                    src = path[0]
-                    for ip in path:
-                        Network.add_node(ip)
-                        Network.add_edge(src, ip)
-                        src = ip
-            else:
-                try:
-                    print("------->>new packet")
-                    print("src ip: "+src_ip)
-                    print("dst ip: "+dst_ip)
-                    
-                    Network.add_node(src_ip)
-                    Network.add_node(dst_ip)
-                    Network.add_edge(src_ip, dst_ip)
-
-                except:
-                    print("ERROR: in webmaper network addsion")
+            except:
+                print("ERROR: in webmaper network addsion")
 
     else:
+        print("(unresolved packet type!) :")
         print(pkt.summary())
         pass
 
@@ -112,4 +99,8 @@ def unload_plugin():
     plt.show()
 
 
+def get_html():
+    
+    html_cont = "<h1>it works!!</h1>"
 
+    return html_cont
