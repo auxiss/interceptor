@@ -3,8 +3,8 @@
 from scapy.all import *
 import matplotlib.pyplot as plt
 import networkx as nx
+from flask import render_template
 
-import plugins.icmpTracer as tacer
 
 Network = nx.Graph()
 lisener = None
@@ -99,8 +99,23 @@ def unload_plugin():
     plt.show()
 
 
-def get_html():
-    
-    html_cont = "<h1>it works!!</h1>"
+from flask import current_app
 
-    return html_cont
+def get_html():
+    try:
+        print("Attempting to render webmaper_html.html...")
+
+        absolute_template_path = os.path.join(os.path.dirname(__file__), "templates")
+        print(f"Using template path: {absolute_template_path}")
+
+        with current_app.app_context():
+            current_app.jinja_loader.searchpath.insert(0, absolute_template_path)
+            html_cont = render_template("webmaper_html.html")
+            current_app.jinja_loader.searchpath.pop(0)
+
+        print("webmaper_html.html rendered successfully.")
+        return html_cont
+    except Exception as e:
+        print(f"Error rendering webmaper_html.html: {e}")
+        return f"Error: {e}"
+

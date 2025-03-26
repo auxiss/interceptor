@@ -1,13 +1,9 @@
 #!./venv/bin/python3
 from scapy.all import *
-import importlib
 import os
-
-
-
 import importlib.util
 import sys
-import os
+from flask import jsonify
 
 
 def load_module_from_path(plugin_path):
@@ -102,5 +98,27 @@ class FLowParcer:
                 self.active_aplugins.remove(active_aplugin)
                 print(len(self.active_aplugins))
 
-              
 
+              
+    def get_plugin_html(self,plugin_name):
+        print(f'plugin name: {plugin_name}')
+
+        for active_aplugin in self.active_aplugins:
+
+            print("active:,input: "+str(active_aplugin.__name__)+","+str(plugin_name))
+
+            if plugin_name.lower() in active_aplugin.__name__.lower():
+                
+                if hasattr(active_aplugin, "get_html"):
+                    html_cont =  active_aplugin.get_html()
+
+                    return html_cont
+                
+                else:
+                    print(f'pluginLoader: plugin {plugin_name} has no attribute "get_html"')
+                    return jsonify(f'plugin {plugin_name} has no attribute "get_html"')
+
+            else:
+                print(f'pluginLoader: plugin {plugin_name} is not active')
+                return jsonify(f'plugin {plugin_name} is not active')
+                

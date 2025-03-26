@@ -171,6 +171,39 @@ def pluginsApi():
     
 
 
+@app.route('/plugin/<pluginName>')
+def show_user(pluginName):
+    html = FLowParcer.get_plugin_html(pluginName)
+
+    if not html: return jsonify("server: plugin not found"), 404
+
+    
+
+    print(f'template var type {html}')
+    return html
+
+    
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=True)
+
+
+
+
+
+
+
+
+'''
+WEBAPP
+|-PLUGINS
+|-webmaper.plug
+| |-webmaper.py
+| |-templates
+|   |-index.html   //confiction
+|-templates
+  |-index.html   //confiction
+'''
+  
