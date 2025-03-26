@@ -122,3 +122,27 @@ class FLowParcer:
                 print(f'pluginLoader: plugin {plugin_name} is not active')
                 return jsonify(f'plugin {plugin_name} is not active')
                 
+
+
+
+    def post_api(self,plugin_name,post_request):
+        print(f'plugin name: {plugin_name}')
+
+        for active_aplugin in self.active_aplugins:
+
+            print("active:,input: "+str(active_aplugin.__name__)+","+str(plugin_name))
+
+            if plugin_name.lower() in active_aplugin.__name__.lower():
+                
+                if hasattr(active_aplugin, "request_handler"):
+                    json =  active_aplugin.request_handler()
+
+                    return json
+                
+                else:
+                    print(f'pluginLoader: plugin {plugin_name} has no attribute "request_handler"')
+                    return jsonify(f'plugin {plugin_name} has no attribute "request_handler"')
+
+            else:
+                print(f'pluginLoader: plugin {plugin_name} is not active')
+                return jsonify(f'plugin {plugin_name} is not active')

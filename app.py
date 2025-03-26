@@ -172,16 +172,24 @@ def pluginsApi():
 
 
 @app.route('/plugin/<pluginName>')
-def show_user(pluginName):
+def plugin(pluginName):
     html = FLowParcer.get_plugin_html(pluginName)
 
     if not html: return jsonify("server: plugin not found"), 404
 
-    
-
-    print(f'template var type {html}')
     return html
 
+
+
+@app.route('/pluginApi/<pluginName>', methods=['POST'])
+def plugindata(pluginName):
+    req = request.get_json()
+    print(req)
+    json = FLowParcer.post_api(pluginName, req)
+
+    if not json: return jsonify("json object is Nona type"), 404
+
+    return json
     
 
 
@@ -195,15 +203,3 @@ if __name__ == '__main__':
 
 
 
-
-'''
-WEBAPP
-|-PLUGINS
-|-webmaper.plug
-| |-webmaper.py
-| |-templates
-|   |-index.html   //confiction
-|-templates
-  |-index.html   //confiction
-'''
-  

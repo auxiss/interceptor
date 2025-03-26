@@ -4,6 +4,7 @@ from scapy.all import *
 import matplotlib.pyplot as plt
 import networkx as nx
 from flask import render_template
+from flask import jsonify
 
 
 Network = nx.Graph()
@@ -118,4 +119,13 @@ def get_html():
     except Exception as e:
         print(f"Error rendering webmaper_html.html: {e}")
         return f"Error: {e}"
+    
+
+def request_handler():
+    print("Nodes:", list(Network.nodes()))
+    print("Edges:", list(Network.edges()))
+    return jsonify({
+        "nodes": list(Network.nodes()),  # Convert NodeView to a list
+        "edges": list(Network.edges())  # Convert EdgeView to a list
+    })
 

@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Maper</title>
-</head>
+</head>S
 <body>
     <h1>hello this is web maper</h1>
+    <script>
+        
+        const currentUrl = window.location.href; 
+        const plugin = currentUrl.split('/')[4];
+        console.log(plugin); 
+
+        fetch(`http://127.0.0.1:5000/pluginApi/${plugin}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                content: 'empty'
+            })
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return res.json()
+        })
+        .then(data => {
+            console.log(data);
+            
+
+        })
+    </script>   
 </body>
 </html>
