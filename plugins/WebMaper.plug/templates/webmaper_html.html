@@ -4,33 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Maper</title>
-</head>S
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; background-color: #222; }
+    </style>
+</head>
 <body>
-    <h1>hello this is web maper</h1>
+
     <script>
         
         const currentUrl = window.location.href; 
         const plugin = currentUrl.split('/')[4];
         console.log(plugin); 
+        let graphData = null;
+        let SCALE = 500;
+        let Xview = 0
+        let Yview = 0
 
-        fetch(`http://127.0.0.1:5000/pluginApi/${plugin}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                content: 'empty'
-            })
-        })
-        .then(res => {
-            if (!res.ok) {
-                throw new Error('Network response was not ok');
+        
+        // init PIXI application
+        const app = new PIXI.Application({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        backgroundColor: 0x222222
+        });
+        document.body.appendChild(app.view);
+
+        
+
+
+        function refreshMap(graphData) {
+                    
+            // Clear the canvas
+            app.stage.removeChildren();
+
+
+            const nodeMap = {};
+            const centerX = (app.screen.width / 2) - Xview;
+            const centerY = (app.screen.height / 2) - Yview;
+
+            // Draw edges
+            const edgeGraphics = new PIXI.Graphics();
+            edgeGraphics.lineStyle(2, 0x00ff33);
+            graphData.edges.forEach(edge => {
+            const source = graphData.nodes.find(n => n.id === edge.source);
+            const target = graphData.nodes.find(n => n.id === edge.target);
+            if (source && target) {
+                edgeGraphics.moveTo(centerX + source.x * SCALE, centerY + source.y * SCALE);
+                edgeGraphics.lineTo(centerX + target.x * SCALE, centerY + target.y * SCALE);
             }
-            return res.json()
-        })
-        .then(data => {
-            console.log(data);
-            
+            });
+            app.stage.addChild(edgeGraphics);
 
-        })
-    </script>   
+            // Draw nodes
+            graphData.nodes.forEach(node => {
+            const nodeGraphics = new PIXI.Graphics();
+            nodeGraphics.beginFill(0x555555);
+            nodeGraphics.drawCircle(centerX + node.x * SCALE, centerY + node.y * SCALE, 5);
+            nodeGraphics.endFill();
+            app.stage.addChild(nodeGraphics);
+
+            // Add label
+            const label = new PIXI.Text(node.id, { fontSize: 13, fill: 0xffffff });
+            label.anchor.set(0.5);
+            label.x = centerX + node.x * SCALE;
+            label.y = centerY + node.y * SCALE - 20;
+            app.stage.addChild(label);
+            });
+        }
+
+
+
+
+
+
+
+        function Load_JSON_data() {
+            fetch(`http://127.0.0.1:5000/pluginApi/${plugin}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    content: 'empty'
+                })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json()
+            })
+            .then(data => {
+                graphData = data;
+                refreshMap(graphData);
+            })
+            .catch(error => console.error("Error loading JSON:", error));
+        }
+
+
+
+        let zoom = 0; // Initial zoom
+
+        app.view.addEventListener('wheel', (event) => {
+            event.preventDefault(); // Prevent the default scroll behavior
+
+            // Adjust the zoom based on the scroll direction
+            if (event.deltaY > 0) {
+                if (zoom >= 100) {
+                    zoom  = zoom -event.deltaY; // Scroll up
+                }
+            } else {
+                if (zoom <= 5000) {
+                    zoom = zoom -event.deltaY; // Scroll down
+                }
+            }
+            
+            
+            SCALE = Math.max(100, Math.min(5000, zoom));
+            console.log('zoom:', zoom); // Log the updated zoom
+        });
+
+        let startX, startY;
+        let isDragging = false;
+
+        // Handle touchstart and mousedown
+        const startInteraction = (e) => {
+            const point = e.touches ? e.touches[0] : e; // Use touch point or mouse point
+            startX = point.clientX;
+            startY = point.clientY;
+            isDragging = true;
+        };
+
+        // Handle touchmove and mousemove
+        const moveInteraction = (e) => {
+            if (!isDragging) return;
+
+            const point = e.touches ? e.touches[0] : e; // Use touch point or mouse point
+            const deltaX = point.clientX - startX;
+            const deltaY = point.clientY - startY;
+
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                Xview -= deltaX;
+                if (deltaX > 0) {
+                    console.log('Dragging right');
+                } else {
+                    console.log('Dragging left');
+                }
+            } else {
+                Yview -= deltaY;
+                if (deltaY < 0) {
+                    console.log('Dragging down');
+                } else {
+                    console.log('Dragging up');
+                }
+            }
+
+            // Update start positions for continuous dragging
+            startX = point.clientX;
+            startY = point.clientY;
+        };
+
+        // Handle touchend and mouseup
+        const endInteraction = () => {
+            isDragging = false;
+        };
+
+        // Add event listeners for both touch and mouse events
+        app.view.addEventListener('touchstart', startInteraction);
+        app.view.addEventListener('touchmove', moveInteraction);
+        app.view.addEventListener('touchend', endInteraction);
+
+        app.view.addEventListener('mousedown', startInteraction);
+        app.view.addEventListener('mousemove', moveInteraction);
+        app.view.addEventListener('mouseup', endInteraction);
+
+                
+        //setInterval(Load_JSON_data, 30000);
+
+        setInterval(() => {
+        if (graphData) {
+            refreshMap(graphData);
+        } 
+        else {
+            console.log('No data to display');
+        }
+        }, 100);
+
+        Load_JSON_data();
+
+    </script> 
 </body>
 </html>

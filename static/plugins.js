@@ -60,7 +60,7 @@ function showActivePLugins(){
             HTMLmain.appendChild(div); 
             
             div.addEventListener('click', () => {
-                window.open(`http://127.0.0.1:5000/plugin/${plugin}`, '_blank', 'width=800,height=600');
+                window.open(`http://127.0.0.1:5000/plugin/${plugin}`, '_blank');
             });
 
 

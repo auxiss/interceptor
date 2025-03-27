@@ -14,6 +14,21 @@ BrigeIface = None
 tracingMode = False
 
 
+import json
+
+def net_to_json(net_map):
+  
+    pos = nx.spring_layout(net_map)  
+
+    graph_data = {
+        "nodes": [{"id": node, "x": float(pos[node][0]), "y": float(pos[node][1])} for node in net_map.nodes],
+        "edges": [{"source": u, "target": v} for u, v in net_map.edges]
+    }
+
+    return graph_data
+
+
+
 
 def run_plugin(pkt):
     global lisener
@@ -95,9 +110,9 @@ def unload_plugin():
     print("Nodes:", Network.nodes())
     print("Edges:", Network.edges())
 
-    plt.figure(figsize=(6, 6))
-    nx.draw(Network, with_labels=True, node_color="skyblue", node_size=100, font_size=10)
-    plt.show()
+    #plt.figure(figsize=(6, 6))
+    #nx.draw(Network, with_labels=True, node_color="skyblue", node_size=100, font_size=10)
+    #plt.show()
 
 
 from flask import current_app
@@ -122,10 +137,5 @@ def get_html():
     
 
 def request_handler():
-    print("Nodes:", list(Network.nodes()))
-    print("Edges:", list(Network.edges()))
-    return jsonify({
-        "nodes": list(Network.nodes()),  # Convert NodeView to a list
-        "edges": list(Network.edges())  # Convert EdgeView to a list
-    })
+    return jsonify(net_to_json(Network))
 
